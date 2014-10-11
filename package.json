@@ -1,0 +1,29 @@
+{
+  "name": "eb-mock",
+  "version": "0.0.1",
+  "description": "Mock API for AWS ElasticBeanstalk",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --reporter spec --ui bdd"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jsantell/eb-mock.git"
+  },
+  "author": "Jordan Santell <jsantell@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jsantell/eb-mock/issues"
+  },
+  "devDependencies": {
+    "mocha": ">= 1.3.2",
+    "chai": ">= 1.1.1"
+  },
+  "keywords": [
+    "aws",
+    "eb",
+    "mock",
+    "elastic beanstalk"
+  ],
+  "homepage": "https://github.com/jsantell/eb-mock"
+}
