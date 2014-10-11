@@ -152,4 +152,127 @@ describe("Mock API", function () {
       });
     });
   });
+
+  describe("createEnvironment", function () {
+    it("creates an environment if valid", function (done) {
+      var eb = new EB();
+      eb.createApplication({ ApplicationName: "myapp" }, function (err, data) {
+        eb.createEnvironment({
+          ApplicationName: "myapp",
+          EnvironmentName: "myenv",
+          SolutionStackName: "32bit Amazon Linux running PHP 5.3"
+        }, function (err, data) {
+          expect(data.EnvironmentName).to.be.equal("myenv");
+          done();
+        });
+      });
+    });
+    it("fails if application does not exist", function (done) {
+      var eb = new EB();
+      eb.createEnvironment({
+        ApplicationName: "myapp",
+        EnvironmentName: "myenv",
+        SolutionStackName: "32bit Amazon Linux running PHP 5.3"
+      }, function (err, data) {
+        expect(err.code).to.be.equal("InvalidParameterValue");
+        done();
+      });
+    });
+    it("fails if application version does not exist if defined", function (done) {
+      var eb = new EB();
+      eb.createEnvironment({
+        ApplicationName: "myapp",
+        EnvironmentName: "myenv",
+        SolutionStackName: "32bit Amazon Linux running PHP 5.3",
+        VersionLabel: "nope"
+      }, function (err, data) {
+        expect(err.code).to.be.equal("InvalidParameterValue");
+        done();
+      });
+    });
+  });
+
+  describe("describeEnvironments", function () {
+    it("correctly returns all environments if no constraints", function (done) {
+      var eb = new EB();
+      eb.createApplication({ ApplicationName: "myapp1" }, function (err, data) {
+        eb.createApplication({ ApplicationName: "myapp2" }, function (err, data) {
+          eb.createEnvironment({
+            ApplicationName: "myapp1",
+            EnvironmentName: "myenv1",
+            SolutionStackName: "32bit Amazon Linux running PHP 5.3"
+          }, tick);
+          eb.createEnvironment({
+            ApplicationName: "myapp2",
+            EnvironmentName: "myenv1",
+            SolutionStackName: "32bit Amazon Linux running PHP 5.3"
+          }, tick);
+          eb.createEnvironment({
+            ApplicationName: "myapp1",
+            EnvironmentName: "myenv2",
+            SolutionStackName: "32bit Amazon Linux running PHP 5.3"
+          }, tick);
+        });
+      });
+      var count = 3;
+      function tick () {
+        if (!--count) {
+          eb.describeEnvironments({}, function (err, data) {
+            expect(data.Environments.length).to.be.equal(3);
+            done();
+          });
+        }
+      }
+    });
+    
+    it("correctly filters by params", function (done) {
+      var eb = new EB();
+      eb.createApplication({ ApplicationName: "myapp1" }, function (err, data) {
+        eb.createApplication({ ApplicationName: "myapp2" }, function (err, data) {
+          eb.createEnvironment({
+            ApplicationName: "myapp1",
+            EnvironmentName: "myenv1",
+            SolutionStackName: "32bit Amazon Linux running PHP 5.3"
+          }, tick);
+          eb.createEnvironment({
+            ApplicationName: "myapp2",
+            EnvironmentName: "myenv1",
+            SolutionStackName: "32bit Amazon Linux running PHP 5.3"
+          }, tick);
+          eb.createEnvironment({
+            ApplicationName: "myapp1",
+            EnvironmentName: "myenv2",
+            SolutionStackName: "32bit Amazon Linux running PHP 5.3"
+          }, tick);
+        });
+      });
+      var count = 3;
+      function tick () {
+        if (!--count) {
+          eb.describeEnvironments({ EnvironmentNames: ["myenv1", "myenv2"]}, function (err, data) {
+            expect(data.Environments.length).to.be.equal(3);
+            tick2();
+          });
+          eb.describeEnvironments({ EnvironmentNames: ["nope"]}, function (err, data) {
+            expect(data.Environments.length).to.be.equal(0);
+            tick2();
+          });
+          eb.describeEnvironments({ ApplicationName: "myapp1" }, function (err, data) {
+            expect(data.Environments.length).to.be.equal(2);
+            tick2();
+          });
+          eb.describeEnvironments({ EnvironmentIds: ["yeah"], EnvironmentNames: ["myenv1"]}, function (err, data) {
+            expect(data.Environments.length).to.be.equal(0);
+            tick2();
+          });
+        }
+      }
+      var count2 = 4;
+      function tick2 () {
+        if (!--count2) {
+          done();
+        }
+      }
+    });
+  });
 });
