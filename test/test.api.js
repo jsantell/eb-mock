@@ -271,7 +271,7 @@ describe("Mock API", function () {
         }
       }
     });
-    
+
     it("correctly filters by params", function (done) {
       var eb = new EB();
       eb.createApplication({ ApplicationName: "myapp1" }, function (err, data) {
@@ -373,6 +373,30 @@ describe("Mock API", function () {
           });
         });
       }
+    });
+  });
+  describe("terminateEnvironment", function () {
+    it("removes environment and sets status after delay", function (done) {
+      var eb = new EB();
+      eb["ENV_TERMINATE_DURATION"] = 50;
+      eb.createApplication({ ApplicationName: "myapp1" }, function (err, data) {
+        eb.createEnvironment({ ApplicationName: "myapp1", EnvironmentName: "myenv", SolutionStackName: "32bit Amazon Linux running PHP 5.3" }, function (err, data) {
+          eb.terminateEnvironment({ EnvironmentName: "myenv" }, function (err, data) {
+            expect(err).to.be.equal(null);
+            expect(data.Status).to.be.equal("Terminating");
+            expect(data.Health).to.be.equal("Grey");
+            setTimeout(function () {
+              eb.describeEnvironments({}, function (err, data) {
+                expect(err).to.be.equal(null);
+                console.log(data.Environments);
+                expect(data.Environments[0].Status).to.be.equal("Terminated");
+                expect(data.Environments[0].Health).to.be.equal("Grey");
+                done();
+              });
+            }, 200);
+          });
+        });
+      });
     });
   });
 });

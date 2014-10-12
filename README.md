@@ -21,7 +21,6 @@ Implements all [ElasticBeanstalk operations](http://docs.aws.amazon.com/elasticb
 * RetrieveEnvironmentInfo
 * RequestEnvironmentInfo
 * RestartAppServer
-* TerminateEnvironment
 * UpdateConfigurationTemplate
 * UpdateApplicationVersion
 * ValidateConfigurationSettings
