@@ -119,6 +119,12 @@ describe("Validate", function () {
         EnvironmentName: "mye_nv",
         SolutionStackName: "32bit Amazon Linux running PHP 5.3"
       }).code).to.be.equal("InvalidParameterValue");
+      
+      expect(validate.validate("createEnvironment", {
+        ApplicationName: "myapp",
+        EnvironmentName: "mye-nv",
+        SolutionStackName: "32bit Amazon Linux running PHP 5.3"
+      })).to.be.equal(null);
     });
     it("OptionSettings constraint", function () {
       expect(validate.validate("createEnvironment", {
