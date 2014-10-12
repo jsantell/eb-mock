@@ -159,4 +159,39 @@ describe("Validate", function () {
       }).code).to.be.equal("InvalidParameterCombination");
     });
   });
+
+  describe("CNAME swap validation", function () {
+    it("passes for two EnvironmentIds", function () {
+      expect(validate.validate("swapEnvironmentCNAMEs", {
+        SourceEnvironmentId: "super",
+        DestinationEnvironmentId: "radical"
+      })).to.be.equal(null);
+    });
+    it("passes for two EnvironmentNames", function () {
+      expect(validate.validate("swapEnvironmentCNAMEs", {
+        SourceEnvironmentName: "super",
+        DestinationEnvironmentName: "radical"
+      })).to.be.equal(null);
+    });
+    it("passes for both EnvironmentNames and EnvironmentIds", function () {
+      expect(validate.validate("swapEnvironmentCNAMEs", {
+        SourceEnvironmentName: "super",
+        DestinationEnvironmentName: "radical",
+        SourceEnvironmentId: "super",
+        DestinationEnvironmentId: "radical"
+      })).to.be.equal(null);
+    });
+    it("fails when missing an extra id", function () {
+      expect(validate.validate("swapEnvironmentCNAMEs", {
+        SourceEnvironmentName: "super",
+        DestinationEnvironmentName: "radical",
+        DestinationEnvironmentId: "radical"
+      }).code).to.be.equal("InvalidParameterValue");
+    });
+    it("fails when missing any pair", function () {
+      expect(validate.validate("swapEnvironmentCNAMEs", {
+        SourceEnvironmentName: "super",
+      }).code).to.be.equal("InvalidParameterValue");
+    });
+  });
 });

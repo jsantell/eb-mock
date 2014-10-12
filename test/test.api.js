@@ -345,4 +345,34 @@ describe("Mock API", function () {
       });
     });
   });
+  
+  describe("swapEnvironmentCNAMEs", function () {
+    it("switches CNAMEs", function (done) {
+      var eb = new EB();
+      eb.createApplication({ ApplicationName: "myapp1" }, function (err, data) {
+        eb.createEnvironment({
+          ApplicationName: "myapp1", EnvironmentName: "app1", SolutionStackName: "32bit Amazon Linux running PHP 5.3", CNAMEPrefix: "app1cname"
+        }, function (err, data) {
+          eb.createEnvironment({
+            ApplicationName: "myapp1", EnvironmentName: "app2", SolutionStackName: "32bit Amazon Linux running PHP 5.3", CNAMEPrefix: "app2cname"
+          }, ready);
+        });
+      });
+
+      function ready () {
+        eb.swapEnvironmentCNAMEs({ SourceEnvironmentName: "app1", DestinationEnvironmentName: "app2" }, function (err, data) {
+          eb.describeEnvironments({}, function (err, data) {
+            var app1 = data.Environments[0];
+            var app2 = data.Environments[1];
+
+            expect(app1.EnvironmentName).to.be.equal("app1");
+            expect(app1.CNAME).to.be.equal("http://app2cname.elasticbeanstalk.com");
+            expect(app2.EnvironmentName).to.be.equal("app2");
+            expect(app2.CNAME).to.be.equal("http://app1cname.elasticbeanstalk.com");
+            done();
+          });
+        });
+      }
+    });
+  });
 });
