@@ -3,6 +3,20 @@ var EB = require("../");
 
 describe("Mock API", function () {
   describe("general", function () {
+    it("modifying responses does not modify internal state", function (done) {
+      var eb = new EB();
+      eb.createApplication({ ApplicationName: "my-app" }, function (err, data) {
+        data.myParam = "hello";
+        data.DateCreated = "yeah";
+        
+        eb.describeApplications({}, function (err, data) {
+          var app = data.Applications[0];
+          expect(app.myParam).to.be.equal(undefined);
+          expect(app.DateCreated).to.be.a("date");
+          done();
+        });
+      });
+    });
     it("stubs out unsupported methods", function (done) {
       var eb = new EB();
       var count = EB.UNSUPPORTED.length;
