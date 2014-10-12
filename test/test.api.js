@@ -8,7 +8,7 @@ describe("Mock API", function () {
       eb.createApplication({ ApplicationName: "my-app" }, function (err, data) {
         data.myParam = "hello";
         data.DateCreated = "yeah";
-        
+
         eb.describeApplications({}, function (err, data) {
           var app = data.Applications[0];
           expect(app.myParam).to.be.equal(undefined);
@@ -351,6 +351,21 @@ describe("Mock API", function () {
       });
     });
 
+    it("fails when application does not have version if defined", function (done) {
+      var eb = new EB();
+      eb.createApplication({ ApplicationName: "myapp1" }, function (err, data) {
+        eb.createApplicationVersion({ ApplicationName: "myapp1", VersionLabel: "a version" }, function (err, data) {
+
+          eb.createEnvironment({ ApplicationName: "myapp1", EnvironmentName: "myenv", SolutionStackName: "32bit Amazon Linux running PHP 5.3" }, function (err, data) {
+            eb.updateEnvironment({ EnvironmentId: data.EnvironmentId, VersionLabel: "a version" }, function (err, data) {
+              expect(data.VersionLabel).to.be.equal("a version");
+              done();
+            });
+          });
+        });
+      });
+    });
+
     it("fails when no environment found", function (done) {
       var eb = new EB();
       eb.updateEnvironment({ EnvironmentId: "e-abcdefghij", Description: "Whooo yeah" }, function (err, data) {
@@ -359,7 +374,7 @@ describe("Mock API", function () {
       });
     });
   });
-  
+
   describe("swapEnvironmentCNAMEs", function () {
     it("switches CNAMEs", function (done) {
       var eb = new EB();
@@ -402,7 +417,6 @@ describe("Mock API", function () {
             setTimeout(function () {
               eb.describeEnvironments({}, function (err, data) {
                 expect(err).to.be.equal(null);
-                console.log(data.Environments);
                 expect(data.Environments[0].Status).to.be.equal("Terminated");
                 expect(data.Environments[0].Health).to.be.equal("Grey");
                 done();
