@@ -1,4 +1,4 @@
-eb-mock
+eb-mock [![Build Status](https://travis-ci.org/jsantell/eb-mock.png)](https://travis-ci.org/jsantell/eb-mock)
 =======
 
 Mock API for AWS ElasticBeanstalk.
@@ -38,3 +38,16 @@ eb.createApplication({
   console.log(data);
 });
 ```
+
+## Testing
+
+`npm test`
+
+## TODO
+
+* Add other methods as needed
+* Perfect parity with AWS errors
+
+## License
+
+Copyright (c) 2014 Jordan Santell
