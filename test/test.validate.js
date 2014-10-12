@@ -144,6 +144,13 @@ describe("Validate", function () {
         Tags: [{ NotValid: "yeah" }]
       }).code).to.be.equal("InvalidParameterValue");
     });
-  });
 
+    it("fails when attempting to update both version and configuration", function () {
+      expect(validate.validate("updateEnvironment", {
+        EnvironmentName: "myenv",
+        VersionLabel: "1.0.0",
+        Tier: { Name: "yeah", Type: "duno", Version: "whatever" }
+      }).code).to.be.equal("InvalidParameterCombination");
+    });
+  });
 });

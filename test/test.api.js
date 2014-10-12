@@ -275,4 +275,27 @@ describe("Mock API", function () {
       }
     });
   });
+
+  describe("updateEnvironment", function () {
+    it("updates environment", function (done) {
+      var eb = new EB();
+      eb.createApplication({ ApplicationName: "myapp1" }, function (err, data) {
+        eb.createEnvironment({ ApplicationName: "myapp1", EnvironmentName: "myenv", SolutionStackName: "32bit Amazon Linux running PHP 5.3" }, function (err, data) {
+          eb.updateEnvironment({ EnvironmentId: data.EnvironmentId, Description: "Whooo yeah" }, function (err, data) {
+            expect(data.Description).to.be.equal("Whooo yeah");
+            done();
+          });
+
+        });
+      });
+    });
+
+    it("fails when no environment found", function (done) {
+      var eb = new EB();
+      eb.updateEnvironment({ EnvironmentId: "e-abcdefghij", Description: "Whooo yeah" }, function (err, data) {
+        expect(err.code).to.be.equal("InvalidParameterValue");
+        done();
+      });
+    });
+  });
 });
