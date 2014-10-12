@@ -208,6 +208,35 @@ describe("Mock API", function () {
         done();
       });
     });
+    it("generates correct CNAME when prefix provided", function (done) {
+      var eb = new EB();
+      eb.createApplication({ ApplicationName: "myapp" }, function (err, data) {
+        eb.createEnvironment({
+          ApplicationName: "myapp",
+          EnvironmentName: "myenv",
+          SolutionStackName: "32bit Amazon Linux running PHP 5.3",
+          CNAMEPrefix: "water"
+        }, function (err, data) {
+          expect(data.CNAME).to.be.equal("http://water.elasticbeanstalk.com");
+          expect(data.CNAMEPrefix).to.be.equal(undefined);
+          done();
+        });
+      });
+    });
+    it("generates correct CNAME when prefix not provided", function (done) {
+      var eb = new EB();
+      eb.createApplication({ ApplicationName: "myapp" }, function (err, data) {
+        eb.createEnvironment({
+          ApplicationName: "myapp",
+          EnvironmentName: "myenv",
+          SolutionStackName: "32bit Amazon Linux running PHP 5.3"
+        }, function (err, data) {
+          expect(/^http:\/\/myenv-[a-z]{10}\.elasticbeanstalk\.com/.test(data.CNAME)).to.be.equal(true);
+          expect(data.CNAMEPrefix).to.be.equal(undefined);
+          done();
+        });
+      });
+    });
   });
 
   describe("describeEnvironments", function () {
