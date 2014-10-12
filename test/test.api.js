@@ -3,6 +3,24 @@ var EB = require("../");
 
 describe("Mock API", function () {
   describe("general", function () {
+    it("stubs out unsupported methods", function (done) {
+      var eb = new EB();
+      var count = EB.UNSUPPORTED.length;
+
+      function tick() {
+        if (!--count) {
+          done();
+        }
+      }
+      EB.UNSUPPORTED.forEach(function (method) {
+        eb[method]({}, function (err, data) {
+          expect(err).to.be.equal(null);
+          expect(data.ResponseMetadata.RequestId).to.be.a("string");
+          tick();
+        });
+      });
+    });
+
     it("successful requests have metadata", function (done) {
       var eb = new EB();
       eb.createApplication({ ApplicationName: "yeah" }, function (err, data) {
